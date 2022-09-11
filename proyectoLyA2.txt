@@ -1,0 +1,96 @@
+options {
+    IGNORE_CASE = false;
+    STATIC = false;
+}
+
+PARSER_BEGIN (ProyectoFinal)
+/** Analizador de expresiones */
+    public class ProyectoFinal {
+        public static void main(String[] args) throws ParseException{
+	ProyectoFinal anLex = new ProyectoFinal (System.in);
+	anLex.unaExpresion();
+	System.out.println("\n\nAnalisis Finalizado");
+            }
+    }
+    PARSER_END (ProyectoFinal)
+
+//                                                Tokens                                                //
+
+TOKEN://Numero
+{
+   <NUMERO: (["0"-"9"])+ >  {System.out.print("Linea: " + matchedToken.beginLine + ". Se encontro numero: " + image);}
+}
+
+TOKEN://Letra
+{
+   <LETRA: ["a"-"z", "A"-"Z"]>  {}
+}
+
+TOKEN://Numero decimal
+{
+   <DECIMAL: (<NUMERO>) "." (<NUMERO>) >  {System.out.print("Linea: " + matchedToken.beginLine + ". Se encontro numero decimal: " + image);}
+}
+
+TOKEN://Simbolos especiales
+{
+   <SIMBOLO: ":" | "\"" | "\'" | "=" | "+" | "*" | "/" | "%" | "&" | "," | "." | ";" | "-" | "<" | ">" | "!" | "|" | "\\" | "º" >  {System.out.print(image);}
+}
+
+TOKEN:	
+{
+   <LLAVES: "(" | ")" | "{" | "}" | "[" | "]" >  {System.out.print(image);}
+}
+
+TOKEN:
+{
+   <TIPODATO: "int" | "char" | "float" | "double" | "class" | "Integer" | "parseInt" | "return" | "boolean" | "String" >  {System.out.print(image);}
+}
+
+TOKEN:
+{
+   <CICLO: "while" | "if" | "do" | "else" | "switch" | "for">  {System.out.print(image);}
+}
+
+TOKEN:
+{
+   <RESERVADA: "public" | "static" | "void" | "main" | "System" | "out" | "println" | "return" | "arg" | "import">  {System.out.print(matchedToken.beginLine + ". Se encontro palabra resevada: " + image);}
+}
+
+TOKEN:
+{
+   <ACENTO: "á" | "é" | "í" | "ó" | "ú"  >  {System.out.print(image);}
+}
+
+TOKEN:
+{
+   <ID: (<LETRA>)([<LETRA>, <NUMERO>, "_"] )* >  {System.out.print(matchedToken.beginLine + ". Se encontro identificador: " + image);}
+}
+
+TOKEN:
+{
+   <ESPACIO: (" ")+ >  {System.out.print(" ");}
+}
+
+//                     ERRORES
+TOKEN:
+{
+   <ERROR1: "." (<NUMERO>) | (<NUMERO>) "." >  {System.out.print("Error al declarar numero decimal");}
+}
+
+//                                              Ignorar 
+SKIP: {"\t" | "\n" | "\r"}
+
+//Comentario de varias lineas 
+SKIP:{<"/*">:DentroComentario}
+<DentroComentario>SKIP:{"*/":DEFAULT}
+<DentroComentario>MORE:{<~[]>}
+
+//Comentario de una linea 
+SKIP:{<"//">:DentroComentario}
+<DentroComentario>SKIP:{"\n":DEFAULT}
+<DentroComentario>MORE:{<~[]>}
+
+void unaExpresion() : {}
+{
+    (<ESPACIO> | <SIMBOLO> | <COMENTARIO> | <ID> | <NUMERO> | <DECIMAL> | <ACENTO> | <LLAVES> | <TIPODATO> | <CICLO> | <RESERVADA>) + <EOF>
+}
